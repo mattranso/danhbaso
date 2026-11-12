@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <style>
+    body { background-color: #f4f6f9; font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+    
+    .top-banner { background: #d32f2f; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+    .banner-left { display: flex; align-items: center; cursor: pointer; transition: 0.2s; }
+    .banner-left:hover { opacity: 0.9; }
+    .banner-logo { width: 55px; height: 55px; margin-right: 15px; object-fit: contain; background: white; border-radius: 50%; padding: 2px; }
+    .banner-text { display: flex; flex-direction: column; }
+    .banner-title { font-size: 22px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1.2; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+    .banner-subtitle { font-size: 14px; margin: 0; }
+    .btn-login-header { background-color: white; color: #b30000; border: none; padding: 8px 20px; font-weight: bold; border-radius: 4px; transition: 0.2s; white-space: nowrap; cursor: pointer; position: relative; z-index: 1001; }
+    .btn-login-header:hover { background-color: #f8d7d7; }
+    .user-badge { background-color: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px; font-size: 14px; margin-right: 10px; }
+
+    .app-main-layout { max-width: 1500px; margin: 15px auto; padding: 0 15px; flex: 1; width: 100%; display: flex; gap: 20px; }
+
+    .sidebar-left { width: 290px; flex-shrink: 0; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 15px; height: calc(100vh - 110px); position: sticky; top: 85px; overflow-y: auto; border-left: 4px solid #d32f2f; }
+    .sidebar-title { font-size: 14px; font-weight: bold; color: #d32f2f; text-transform: uppercase; margin-bottom: 10px; border-bottom: 2px solid #ffcc00; padding-bottom: 5px; }
+    
+    .tree-category-header { font-size: 13px; font-weight: bold; color: #ffffff; background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); padding: 8px 12px; border-radius: 6px; margin-top: 15px; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2); }
+    
+    .tree-parent { font-weight: bold; color: #b30000; padding: 6px 8px; cursor: pointer; border-radius: 4px; background: #fff5f5; margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; transition: 0.2s; }
+    .tree-parent:hover { background: #ffe3e3; }
+    .tree-children { list-style: none; padding-left: 12px; margin: 2px 0 8px 0; display: none; }
+    .tree-children.show { display: block; }
+    .tree-child-item { padding: 5px 8px; font-size: 12px; color: #333; cursor: pointer; border-radius: 4px; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; background: #fdfdfd; border-left: 2px solid #0d6efd; }
+    .tree-child-item:hover { background-color: #e2ecf9; color: #0d6efd; font-weight: bold; }
+
+    .content-center { flex: 1; min-width: 0; background: linear-gradient(135deg, #eef4fc 0%, #e2ecf9 100%); background-image: radial-gradient(rgba(13, 110, 253, 0.08) 1px, transparent 1px), radial-gradient(rgba(13, 110, 253, 0.05) 1px, #eef4fc 1px); background-size: 40px 40px; background-position: 0 0, 20px 20px; border-radius: 8px; padding: 20px; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.02); }
+
+    .form-box { max-width: 500px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .hidden { display: none !important; }
+    .btn-gradient { background: #d32f2f; color: white; border: none; }
+    .btn-gradient:hover { background: #b71c1c; color: white; }
+
+    .tier-main-header { font-size: 16px; font-weight: bold; text-transform: uppercase; padding: 10px 15px; border-radius: 6px; margin-top: 35px; margin-bottom: 20px; color: white; display: flex; align-items: center; gap: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+    .tier-city-bg { background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); }
+    .tier-commune-bg { background: linear-gradient(135deg, #d32f2f 0%, #990000 100%); }
+    .tier-hamlet-bg { background: linear-gradient(135deg, #198754 0%, #146c43 100%); }
+
+    .group-header { color: #b30000; font-weight: bold; border-bottom: 2px solid #ffcc00; padding-bottom: 6px; margin-top: 20px; margin-bottom: 12px; text-transform: uppercase; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    
+    .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; margin-top: 10px; margin-bottom: 25px; background: rgba(255, 255, 255, 0.85); padding: 12px 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); backdrop-filter: blur(5px); }
+    .search-bar-wrapper { flex: 1; max-width: 500px; margin-left: auto; display: flex; gap: 10px; }
+    #filterDonVi { max-width: 210px; font-weight: 500; font-size: 13.5px; }
+    
+    .img-container { max-height: 300px; width: 100%; margin-bottom: 15px; }
+    .img-container img { max-width: 100%; display: block; }
+
+    .app-footer { background-color: #eaeaea; text-align: center; padding: 15px; font-size: 14px; color: #555; width: 100%; border-top: 1px solid #ddd; margin-top: auto; }
+    .author-name { color: #cc0000; font-weight: bold; }
+
+    @media (max-width: 992px) {
+      .app-main-layout { flex-direction: column; padding: 0 10px; }
+      .sidebar-left { width: 100%; height: auto; position: static; margin-bottom: 15px; max-height: 350px; }
+      .content-center { width: 100%; padding: 12px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-bar-wrapper { width: 100%; max-width: 100%; flex-direction: column; }
+      #filterDonVi { max-width: 100%; }
+      .top-banner { flex-direction: column; gap: 10px; text-align: center; padding: 12px 10px; }
+      .banner-left { flex-direction: column; text-align: center; }
+      .banner-logo { margin-right: 0; margin-bottom: 5px; }
+    }
+  </style>
+</head>
+<body>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+  <div class="modal fade" id="sysAlertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header border-0" id="sysAlertHeader">
+          <h5 class="modal-title fw-bold" id="sysAlertTitle"></h5>
+          <button type="button" class="btn-close" id="sysAlertCloseBtn" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-4 fs-5 fw-medium text-dark" id="sysAlertMessage"></div>
+        <div class="modal-footer justify-content-center border-0 pb-4">
+          <button type="button" class="btn btn-secondary px-5 fw-bold shadow-sm" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="cropModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-danger text-white border-0">
+          <h5 class="modal-title fw-bold"><i class="fas fa-crop"></i> Căn chỉnh & Cắt khung hình</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-3">
+          <div class="img-container">
+            <img id="image-to-crop" src="" alt="Picture">
+          </div>
+          <p class="text-muted small m-0">Kéo thả khung hoặc cuộn chuột để phóng to/thu nhỏ lấy vùng ảnh ưng ý.</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger fw-bold px-4" onclick="confirmCropImage()">Xác nhận Cắt ảnh</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="changeUnitModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-info text-white border-0">
+          <h5 class="modal-title fw-bold"><i class="fas fa-exchange-alt"></i> Chuyển Đơn vị Quản trị</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body py-4">
+          <input type="hidden" id="change-unit-row">
+          <label class="form-label fw-bold">Chọn đơn vị mới cho Tài khoản <span id="change-unit-username" class="text-danger"></span>:</label>
+          <select id="change-unit-select" class="form-select"></select>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-info text-white fw-bold" onclick="submitChangeUnit()">Cập nhật</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="batchMoveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white border-0">
+          <h5 class="modal-title fw-bold"><i class="fas fa-exchange-alt"></i> Di chuyển hàng loạt danh bạ</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body py-4">
+          <label class="form-label fw-bold">Chọn đơn vị đích đến cho các nhân sự đã chọn:</label>
+          <select id="batch-target-unit" class="form-select"></select>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary fw-bold" onclick="executeBatchMove()">Xác nhận Di chuyển</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="top-banner">
+    <div class="banner-left" onclick="goHome()" title="Quay lại Trang chủ">
+      <img src="https://lh3.googleusercontent.com/d/1iAINsZHVsv70Cjrkn4syAXGUonVtE-Ce" class="banner-logo" alt="Logo MTTQ" onerror="this.src='https://mattran.org.vn/images/logo.png'">
+      <div class="banner-text">
+        <h1 class="banner-title">DANH BẠ ĐIỆN THOẠI</h1>
+        <p class="banner-subtitle">Ủy ban Mặt trận Tổ quốc Việt Nam thành phố Đồng Nai</p>
+      </div>
+    </div>
+    <div id="header-auth-area">
+      <button class="btn-login-header" id="btn-show-login" onclick="showLoginBox()">Đăng nhập</button>
+      
+      <div id="user-info-area" class="hidden d-flex align-items-center">
+        <button class="btn btn-sm btn-light me-2 fw-bold text-danger" onclick="goHome()"><i class="fas fa-home"></i> Trang chủ</button>
+        <span id="header-user-info" class="user-badge"></span>
+        <button class="btn btn-sm btn-outline-light me-2" onclick="showProfileBox()"><i class="fas fa-id-card"></i> Thông tin</button>
+        <button class="btn btn-sm btn-outline-light me-2" onclick="showChangePwBox()"><i class="fas fa-key"></i> Đổi MK</button>
+        <button class="btn btn-sm btn-outline-light" onclick="doLogout()">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYOUT 2 CỘT CHÍNH -->
+  <div class="app-main-layout">
+    
+    <!-- CỘT TRÁI: CÂY TỔ CHỨC 3 CẤP -->
+    <div class="sidebar-left">
+      <div class="sidebar-title d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-sitemap"></i> Cây Đơn Vị (3 Cấp)</span>
+        <button id="btnAddSubUnitMain" class="btn btn-xs btn-success py-0 px-1 hidden" onclick="promptAddSubUnit()" title="Thêm thôn/ấp/khu phố"><i class="fas fa-plus"></i></button>
+      </div>
+      <div class="mb-2">
+        <input type="text" id="treeSearchInput" class="form-control form-control-sm" placeholder="Tìm kiếm đơn vị, thôn ấp..." onkeyup="filterTreeUnits()">
+      </div>
+      <div id="treeUnitList" class="mt-2">
+        <div class="text-center text-muted small py-3">Đang tải...</div>
+      </div>
+    </div>
+
+    <!-- CỘT PHẢI: NỘI DUNG CHÍNH -->
+    <div class="content-center">
+      <div class="toolbar">
+        <div id="admin-actions-wrapper" class="d-flex gap-2 align-items-center flex-wrap">
+          <button id="btn-add" class="btn btn-gradient hidden text-nowrap shadow-sm" onclick="showForm()">+ Thêm</button>
+          <button id="btn-import" class="btn btn-success hidden fw-bold text-nowrap shadow-sm" onclick="showImportGuide()"><i class="fas fa-file-import"></i> Import</button>
+          <button id="btn-rename-unit" class="btn btn-secondary hidden fw-bold text-nowrap shadow-sm" onclick="promptRenameMyUnit()"><i class="fas fa-edit"></i> Đổi tên Đơn vị</button>
+          
+          <button id="btn-batch-move" class="btn btn-outline-primary hidden fw-bold text-nowrap shadow-sm" onclick="openBatchMoveModal()"><i class="fas fa-exchange-alt"></i> Chuyển đã chọn</button>
+          <button id="btn-batch-delete" class="btn btn-outline-danger hidden fw-bold text-nowrap shadow-sm" onclick="executeBatchDelete()"><i class="fas fa-trash-alt"></i> Xóa đã chọn</button>
+
+          <div id="admin-actions" class="d-flex gap-2 hidden">
+            <button class="btn btn-warning fw-bold text-nowrap shadow-sm" onclick="loadAccountManager()"><i class="fas fa-users-cog"></i> Quản lý TK</button>
+            <button class="btn btn-info text-white fw-bold text-nowrap shadow-sm" onclick="loadUnitManager()"><i class="fas fa-layer-group"></i> QL Đơn vị</button>
+          </div>
+
+          <div id="admin-stats-badge" class="hidden badge bg-danger fs-6 px-3 py-2 shadow-sm" title="Tổng số lượng nhân sự trong hệ thống">
+            <i class="fas fa-address-book"></i> Tổng nhân sự: <span id="total-contacts-count">0</span>
+          </div>
+        </div>
+
+        <div class="search-bar-wrapper">
+          <select id="filterDonVi" class="form-select shadow-sm" onchange="filterContacts()">
+            <option value="">Tất cả Khối / Xã Phường</option>
+          </select>
+          <input type="text" id="searchInput" class="form-control shadow-sm" placeholder="Tìm kiếm tên, chức vụ..." onkeyup="filterContacts()">
+        </div>
+      </div>
+
+      <!-- MAIN CONTAINER VIEWS -->
+      <div id="main-container">
+        <div id="contact-list">
+          <div class="text-center mt-5">
+            <div class="spinner-border text-danger" role="status"></div>
+            <p id="loading-text">Đang tải danh bạ...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CẬP NHẬT THÔNG TIN CÁ NHÂN -->
+      <div id="profile-container" class="hidden mt-4">
+        <div class="form-box">
+          <h5 class="text-danger fw-bold mb-4 text-center">CẬP NHẬT THÔNG TIN CÁ NHÂN</h5>
+          <label class="form-label fw-bold">Họ và tên:</label>
+          <input type="text" id="profile-fullname" class="form-control mb-4" placeholder="Nhập họ và tên mới của bạn">
+          <button class="btn btn-gradient w-100 mb-2" onclick="doUpdateProfile()">Lưu thay đổi</button>
+          <button class="btn btn-secondary w-100" onclick="goHome()">Hủy bỏ</button>
+        </div>
+      </div>
+
+      <!-- ĐỔI MẬT KHẨU -->
+      <div id="password-container" class="hidden mt-4">
+        <div class="form-box">
+          <h5 class="text-danger fw-bold mb-4 text-center">ĐỔI MẬT KHẨU BẢO MẬT</h5>
+          <input type="password" id="pw-old" class="form-control mb-3" placeholder="Mật khẩu hiện tại">
+          <input type="password" id="pw-new" class="form-control mb-3" placeholder="Mật khẩu mới (tối thiểu 6 ký tự)">
+          <input type="password" id="pw-confirm" class="form-control mb-4" placeholder="Nhập lại Mật khẩu mới">
+          <button class="btn btn-gradient w-100 mb-2" onclick="doChangePassword()">Xác nhận Đổi Mật Khẩu</button>
+          <button class="btn btn-secondary w-100" onclick="goHome()">Hủy bỏ</button>
+        </div>
+      </div>
+
+      <!-- IMPORT -->
+      <div id="import-container" class="hidden mt-4">
+        <div class="form-box" style="max-width: 650px;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="text-danger fw-bold m-0">Nhập Danh Bạ Hàng Loạt</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="goHome()"><i class="fas fa-home"></i> Trang chủ</button>
+          </div>
+          <div class="alert alert-warning" style="font-size: 14.5px;">
+            <strong><i class="fas fa-info-circle"></i> Hướng dẫn nhập File (CSV):</strong>
+            <ol class="mt-2 mb-2 ps-3">
+              <li class="mb-1">Bấm <b>Tải File Mẫu</b> về máy và mở bằng Excel.</li>
+              <li class="mb-1">Nhập danh sách cán bộ vào file. <i class="text-danger">(Không dùng dấu phẩy ",")</i></li>
+              <li class="mb-1">Lưu file dưới dạng <b>CSV (Comma delimited)</b>.</li>
+              <li>Bấm <b>Chọn File</b> ở dưới và Upload lên hệ thống.</li>
+            </ol>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Chọn File CSV từ máy tính:</label>
+            <input type="file" id="csv-upload" class="form-control" accept=".csv">
+          </div>
+          <div class="d-flex gap-3 mt-4">
+            <button class="btn btn-outline-success flex-fill fw-bold py-2 shadow-sm" onclick="downloadTemplate()"><i class="fas fa-download"></i> Tải File Mẫu</button>
+            <button class="btn btn-primary flex-fill fw-bold py-2 shadow-sm" onclick="processImport()"><i class="fas fa-cloud-upload-alt"></i> Tải dữ liệu lên</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTH FORM -->
+      <div id="auth-container" class="hidden mt-4">
+        <button class="btn btn-sm btn-outline-secondary mb-3" onclick="goHome()"><i class="fas fa-arrow-left"></i> Quay lại Trang chủ</button>
+        <div class="form-box" id="login-box">
+          <h5 class="text-center mb-4 fw-bold text-danger">ĐĂNG NHẬP QUẢN TRỊ</h5>
+          <input type="text" id="username" class="form-control mb-3" placeholder="Tên đăng nhập" onkeydown="if(event.keyCode===13) doLogin()">
+          <input type="password" id="password" class="form-control mb-3" placeholder="Mật khẩu" onkeydown="if(event.keyCode===13) doLogin()">
+          <button id="btn-login" class="btn btn-gradient w-100 mb-2" onclick="doLogin()">Đăng Nhập</button>
+          <button class="btn btn-outline-danger w-100" onclick="toggleAuthBox()">Đăng Ký Tài Khoản Mới</button>
+        </div>
+        <div class="form-box hidden" id="register-box">
+          <h5 class="text-center mb-4 fw-bold text-danger">ĐĂNG KÝ TÀI KHOẢN</h5>
+          <select id="reg-donvi" class="form-select mb-3"><option>Đang tải danh sách đơn vị...</option></select>
+          <input type="text" id="reg-fullname" class="form-control mb-3" placeholder="Họ và tên người dùng">
+          <div class="mb-2 text-muted" style="font-size: 12.5px;">* Tên đăng nhập phải <b>viết thường, viết liền không dấu</b>. <br>Ví dụ: <i>nguyenvana</i> hoặc <i>phuong.anloc</i></div>
+          <input type="text" id="reg-username" class="form-control mb-3" placeholder="Tên đăng nhập (VD: nguyenvana)">
+          <input type="password" id="reg-password" class="form-control mb-3" placeholder="Mật khẩu">
+          <button class="btn btn-gradient w-100 mb-2" onclick="doRegister()">Gửi Yêu Cầu Đăng Ký</button>
+          <button class="btn btn-link w-100" onclick="toggleAuthBox()">Quay lại Đăng nhập</button>
+        </div>
+      </div>
+
+      <!-- CONTACT FORM -->
+      <div id="form-container" class="hidden mt-4">
+        <div class="form-box">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="text-danger fw-bold m-0" id="form-title">Cập nhật liên hệ</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="goHome()"><i class="fas fa-times"></i> Đóng</button>
+          </div>
+          <input type="hidden" id="c-id">
+          <div class="mb-3 text-center">
+            <label for="c-hinhanh-upload" style="cursor:pointer;">
+              <img id="preview-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 5px;">
+              <br><span class="badge bg-secondary"><i class="fas fa-camera"></i> Chọn ảnh & Cắt khung</span>
+            </label>
+            <input type="file" id="c-hinhanh-upload" accept="image/*" class="d-none">
+          </div>
+          <input type="text" id="c-hoten" class="form-control mb-3" placeholder="Họ và tên">
+          <input type="text" id="c-chucvu" class="form-control mb-3" placeholder="Chức vụ">
+          
+          <label class="form-label fw-bold text-danger small mb-1">Thuộc đơn vị:</label>
+          <select id="c-donvi" class="form-select mb-3"></select>
+
+          <input type="text" id="c-sdt" class="form-control mb-3" placeholder="Số điện thoại">
+          <input type="email" id="c-email" class="form-control mb-4" placeholder="Email">
+          <button class="btn btn-gradient w-100 mb-2" onclick="saveContact()">Lưu thông tin</button>
+          <button class="btn btn-secondary w-100" onclick="goHome()">Hủy bỏ</button>
+        </div>
+      </div>
+
+      <!-- QUẢN LÝ TK -->
+      <div id="admin-container" class="hidden mt-4">
+        <div class="form-box" style="max-width: 750px;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-danger fw-bold m-0">Quản Lý & Duyệt Tài Khoản</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="goHome()"><i class="fas fa-home"></i> Trang chủ</button>
+          </div>
+          <div class="mb-3">
+            <input type="text" id="accountSearchInput" class="form-control" placeholder="Tìm kiếm theo tên đăng nhập hoặc họ tên..." onkeyup="filterAccountList()">
+          </div>
+          <div id="pending-list"></div>
+        </div>
+      </div>
+
+      <!-- QUẢN LÝ ĐƠN VỊ -->
+      <div id="unit-container" class="hidden mt-4">
+        <div class="form-box" style="max-width: 800px;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="text-danger fw-bold m-0">Sắp Xếp & Quản Lý Đơn Vị</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="goHome()"><i class="fas fa-home"></i> Trang chủ</button>
+          </div>
+          <div class="d-flex mb-4">
+            <input type="text" id="new-unit-name" class="form-control me-2" placeholder="Nhập tên đơn vị/xã phường mới...">
+            <button class="btn btn-success text-nowrap" onclick="addUnit()">+ Thêm</button>
+          </div>
+          <div id="unit-list" class="mb-3"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="app-footer">
+    <div class="mb-1">© Bản quyền thuộc <span class="author-name">Lê Văn Nguyên</span> - Ủy ban Mặt trận Tổ quốc Việt Nam thành phố Đồng Nai.</div>
+    <div class="mt-2">
+      <span class="badge bg-secondary shadow-sm" style="font-size: 13px;">
+        <i class="fas fa-chart-line"></i> Tổng lượt truy cập: <span id="view-count"><i class="fas fa-spinner fa-spin"></i></span>
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    let currentUser = { role: 'guest', donVi: '', username: '', fullname: '' }; 
+    let allContacts = []; 
+    let allAccountsData = []; 
+    let compressedImageBase64 = ''; 
+    let allUnitsOrder = []; 
+    let currentSelectedParent = ''; 
+    let customLabels = {}; 
+    let cropper = null;
+
+    let explicitCityBlocks = [];
+
+    window.onload = () => { 
+      fetchUnitTreeData(); 
+      fetchPageViews();
+    };
+
+    function fetchPageViews() {
+      google.script.run.withSuccessHandler(views => {
+        let viewEl = document.getElementById('view-count');
+        if(viewEl) viewEl.innerText = views;
+      }).getAndIncrementPageViews();
+    }
+
+    function switchView(targetId) {
+      try {
+        const views = ['main-container', 'auth-container', 'form-container', 'admin-container', 'unit-container', 'import-container', 'password-container', 'profile-container'];
+        views.forEach(id => {
+          let el = document.getElementById(id);
+          if (el) {
+            if (id === targetId) {
+              el.classList.remove('hidden');
+            } else {
+              el.classList.add('hidden');
+            }
+          }
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch(e) {
+        console.error("Lỗi chuyển đổi View:", e);
+      }
+    }
+
+    function showSystemAlert(msg, type = 'success') {
+      let modalEl = document.getElementById('sysAlertModal');
+      let header = document.getElementById('sysAlertHeader');
+      let title = document.getElementById('sysAlertTitle');
+      let message = document.getElementById('sysAlertMessage');
+      let btnClose = document.getElementById('sysAlertCloseBtn');
+
+      message.innerHTML = msg; 
+      header.className = 'modal-header border-0'; 
+      btnClose.className = 'btn-close';
+      
+      if(type === 'success') { 
+        header.classList.add('bg-success', 'text-white'); 
+        btnClose.classList.add('btn-close-white'); 
+        title.innerHTML = '<i class="fas fa-check-circle"></i> Thành Công'; 
+      } else if(type === 'error') { 
+        header.classList.add('bg-danger', 'text-white'); 
+        btnClose.classList.add('btn-close-white'); 
+        title.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Lỗi hệ thống'; 
+      } else if(type === 'warning') { 
+        header.classList.add('bg-warning', 'text-dark'); 
+        title.innerHTML = '<i class="fas fa-info-circle"></i> Thông báo'; 
+      }
+
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+    
+    function fetchUnitTreeData() {
+      google.script.run.withFailureHandler(err => {
+         document.getElementById('contact-list').innerHTML = '<div class="alert alert-danger mt-4 text-center"><b>Lỗi Kết Nối CSDL:</b> ' + err.message + '</div>';
+      }).withSuccessHandler(res => {
+          allUnitsOrder = res.units || [];
+          explicitCityBlocks = res.cityBlocks || [];
+          
+          let combinedDropdownList = [...explicitCityBlocks, ...allUnitsOrder];
+
+          let optDropdown = '<option value="">Tất cả Khối / Xã Phường</option>';
+          let optReg = '';
+          let optFormEdit = '';
+          let optBatchMove = '';
+
+          let uniqueDropdownSet = new Set(combinedDropdownList);
+          uniqueDropdownSet.forEach(u => {
+            optDropdown += '<option value="' + u + '">' + u + '</option>';
+            optReg += '<option value="' + u + '">' + u + '</option>';
+            optFormEdit += '<option value="' + u + '">' + u + '</option>';
+            optBatchMove += '<option value="' + u + '">' + u + '</option>';
+          });
+
+          document.getElementById('filterDonVi').innerHTML = optDropdown;
+          document.getElementById('reg-donvi').innerHTML = optReg;
+          document.getElementById('c-donvi').innerHTML = optFormEdit;
+          document.getElementById('batch-target-unit').innerHTML = optBatchMove;
+          
+          buildTreeUI(allUnitsOrder);
+          loadContacts();
+      }).getInitData();
+    }
+
+    function updateFormDropdownUnits(extraSubName = '') {
+      let combined = [...explicitCityBlocks, ...allUnitsOrder];
+
+      document.querySelectorAll('.tree-child-item span:first-child').forEach(el => {
+        let txt = el.innerText.trim();
+        if(txt && !txt.startsWith('Xem toàn bộ') && !combined.includes(txt)) {
+          combined.push(txt);
+        }
+      });
+      if(extraSubName && !combined.includes(extraSubName)) combined.push(extraSubName);
+
+      let uniqueFormSet = new Set(combined);
+      let optFormEdit = '';
+      uniqueFormSet.forEach(u => {
+        optFormEdit += '<option value="' + u + '">' + u + '</option>';
+      });
+      document.getElementById('c-donvi').innerHTML = optFormEdit;
+      document.getElementById('batch-target-unit').innerHTML = optFormEdit;
+    }
+
+    function getCityAndCommuneUnits(units) {
+      let cityList = [];
+      let communeList = [];
+
+      units.forEach(u => {
+        let lower = String(u).toLowerCase();
+        if (explicitCityBlocks.includes(u) || lower.includes("thành phố") || u === "Ban Thường trực" || u === "Văn phòng") {
+          if (!cityList.includes(u)) cityList.push(u);
+        } else {
+          if (!communeList.includes(u)) communeList.push(u);
+        }
+      });
+
+      let defaults = ["Ban Thường trực", "Văn phòng"];
+      defaults.forEach(d => {
+        if (!cityList.includes(d)) cityList.unshift(d);
+      });
+
+      return { cityList, communeList };
+    }
+
+    function buildTreeUI(units) {
+      let treeHtml = '';
+      let { cityList, communeList } = getCityAndCommuneUnits(units);
+
+      let displayCityBlocks = cityList;
+      if (currentUser.role === 'user' && !cityList.includes(currentUser.donVi)) {
+        displayCityBlocks = []; 
+      }
+
+      if (displayCityBlocks.length > 0) {
+        treeHtml += '<div class="tree-category-header"><i class="fas fa-city"></i> Cấp Thành Phố</div>';
+        displayCityBlocks.forEach((u, index) => {
+          let labelText = customLabels[u] ? customLabels[u] : "[Xem toàn bộ]";
+          let canManageThisUnit = (currentUser.role === 'admin' || currentUser.donVi === u);
+
+          let actionAll = '';
+          if(canManageThisUnit) {
+            let defaultCity = ["Ban Thường trực", "Văn phòng"];
+            let adminDemoteBtn = (currentUser.role === 'admin' && !defaultCity.includes(u)) ? '<i class="fas fa-level-down-alt text-warning me-1" onclick="event.stopPropagation(); promptDemoteUnitToCommune(\'' + String(u).replace(/'/g, "\\'") + '\')" title="Đưa về cấp Xã/Phường"></i>' : '';
+            actionAll = '<span class="text-nowrap">' +
+              adminDemoteBtn +
+              '<i class="fas fa-edit text-primary me-1" onclick="event.stopPropagation(); promptEditAllLabel(\'' + String(u).replace(/'/g, "\\'") + '\', \'city_' + index + '\')" title="Sửa tên"></i>' +
+              '<i class="fas fa-trash text-danger" onclick="event.stopPropagation(); promptClearAllLabel(\'' + String(u).replace(/'/g, "\\'") + '\', \'city_' + index + '\')" title="Mặc định"></i>' +
+            '</span>';
+          }
+
+          treeHtml += '<div data-parent-unit="' + u + '">' +
+            '<div class="tree-parent" onclick="toggleTreeChildren(\'city_' + index + '\', \'' + String(u).replace(/'/g, "\\'") + '\')">' +
+              '<span><i class="fas fa-building text-primary"></i> ' + u + '</span>' +
+              '<i class="fas fa-chevron-down small" id="chevron-city_' + index + '"></i>' +
+            '</div>' +
+            '<ul class="tree-children" id="children-city_' + index + '">' +
+              '<li class="tree-child-item fw-bold text-danger" onclick="selectTreeUnit(\'' + String(u).replace(/'/g, "\\'") + '\')">' +
+                '<span><i class="fas fa-star small"></i> <span id="label-all-city_' + index + '">' + labelText + '</span></span>' +
+                actionAll +
+              '</li>' +
+              '<div id="sub-list-city_' + index + '"><li class="text-muted small py-1 px-2">Đang tải...</li></div>' +
+            '</ul>' +
+          '</div>';
+        });
+      }
+
+      let displayCommunes = communeList;
+      if (currentUser.role === 'user' && currentUser.donVi) {
+        displayCommunes = communeList.filter(u => u === currentUser.donVi);
+        document.getElementById('filterDonVi').value = currentUser.donVi;
+      }
+
+      if (displayCommunes.length > 0) {
+        treeHtml += '<div class="tree-category-header"><i class="fas fa-map-marked-alt"></i> Cấp Xã / Phường (' + displayCommunes.length + ' ĐV)</div>';
+        displayCommunes.forEach((u, index) => {
+          let labelText = customLabels[u] ? customLabels[u] : "[Xem toàn bộ]";
+          let canManageThisUnit = (currentUser.role === 'admin' || currentUser.donVi === u);
+
+          let actionAll = '';
+          if(canManageThisUnit) {
+            let adminMoveBtn = currentUser.role === 'admin' ? '<i class="fas fa-level-up-alt text-success me-1" onclick="event.stopPropagation(); promptPromoteUnitToCity(\'' + String(u).replace(/'/g, "\\'") + '\')" title="Đẩy lên cấp Thành Phố"></i>' : '';
+            actionAll = '<span class="text-nowrap">' +
+              adminMoveBtn +
+              '<i class="fas fa-edit text-primary me-1" onclick="event.stopPropagation(); promptEditAllLabel(\'' + String(u).replace(/'/g, "\\'") + '\', \'unit_' + index + '\')" title="Sửa tên"></i>' +
+              '<i class="fas fa-trash text-danger" onclick="event.stopPropagation(); promptClearAllLabel(\'' + String(u).replace(/'/g, "\\'") + '\', \'unit_' + index + '\')" title="Mặc định"></i>' +
+            '</span>';
+          }
+
+          treeHtml += '<div data-parent-unit="' + u + '">' +
+            '<div class="tree-parent" onclick="toggleTreeChildren(\'unit_' + index + '\', \'' + String(u).replace(/'/g, "\\'") + '\')">' +
+              '<span><i class="fas fa-landmark text-danger"></i> ' + u + '</span>' +
+              '<i class="fas fa-chevron-down small" id="chevron-unit_' + index + '"></i>' +
+            '</div>' +
+            '<ul class="tree-children" id="children-unit_' + index + '">' +
+              '<li class="tree-child-item fw-bold text-danger" onclick="selectTreeUnit(\'' + String(u).replace(/'/g, "\\'") + '\')">' +
+                '<span><i class="fas fa-star small"></i> <span id="label-all-unit_' + index + '">' + labelText + '</span></span>' +
+                actionAll +
+              '</li>' +
+              '<div id="sub-list-unit_' + index + '"><li class="text-muted small py-1 px-2">Đang tải thôn/ấp...</li></div>' +
+            '</ul>' +
+          '</div>';
+        });
+      }
+
+      document.getElementById('treeUnitList').innerHTML = treeHtml || '<div class="text-muted small text-center p-3">Không có quyền hiển thị đơn vị.</div>';
+      
+      if (currentUser.role === 'user') {
+        if (displayCommunes.length > 0) {
+          toggleTreeChildren('unit_0', displayCommunes[0]);
+        } else if (displayCityBlocks.length > 0) {
+          toggleTreeChildren('city_0', displayCityBlocks[0]);
+        }
+      }
+    }
+
+    function promptPromoteUnitToCity(unitName) {
+      if(confirm('Chắc chắn muốn đưa đơn vị "' + unitName + '" lên Khối Cấp Thành Phố?')) {
+        if (!explicitCityBlocks.includes(unitName)) {
+          explicitCityBlocks.push(unitName);
+        }
+        google.script.run.withSuccessHandler(() => {
+          showSystemAlert('Đã đưa đơn vị lên cấp Thành Phố thành công!', 'success');
+          fetchUnitTreeData();
+        }).saveCityBlocks(explicitCityBlocks);
+      }
+    }
+
+    function promptDemoteUnitToCommune(unitName) {
+      if(confirm('Chắc chắn muốn đưa đơn vị "' + unitName + '" về lại cấp Xã/Phường?')) {
+        explicitCityBlocks = explicitCityBlocks.filter(b => b !== unitName);
+        google.script.run.withSuccessHandler(() => {
+          showSystemAlert('Đã đưa đơn vị về lại cấp Xã/Phường thành công!', 'success');
+          fetchUnitTreeData();
+        }).saveCityBlocks(explicitCityBlocks);
+      }
+    }
+
+    function toggleTreeChildren(indexKey, parentName) {
+      currentSelectedParent = parentName;
+      let canManageThisUnit = (currentUser.role === 'admin' || currentUser.donVi === parentName);
+      
+      if(canManageThisUnit) {
+        document.getElementById('btnAddSubUnitMain').classList.remove('hidden');
+      } else {
+        document.getElementById('btnAddSubUnitMain').classList.add('hidden');
+      }
+
+      let childEl = document.getElementById('children-' + indexKey);
+      let chevronEl = document.getElementById('chevron-' + indexKey);
+      
+      if(childEl.classList.contains('show')) {
+        childEl.classList.remove('show');
+        chevronEl.className = 'fas fa-chevron-down small';
+      } else {
+        childEl.classList.add('show');
+        chevronEl.className = 'fas fa-chevron-up small';
+        loadSubUnits(parentName, indexKey);
+      }
+    }
+
+    function loadSubUnits(parentName, indexKey) {
+      google.script.run.withSuccessHandler(subs => {
+        let subHtml = '';
+        let canManageThisUnit = (currentUser.role === 'admin' || currentUser.donVi === parentName);
+
+        if(subs.length === 0) {
+          subHtml = '<li class="text-muted small py-1 px-2 fst-italic">Chưa có thôn/ấp. (Bấm dấu + để thêm)</li>';
+        } else {
+          subs.forEach(s => {
+            let fullSubUnitName = parentName + " - " + s.name;
+            updateFormDropdownUnits(fullSubUnitName);
+
+            let adminSubBtns = '';
+            if(canManageThisUnit) {
+              adminSubBtns = '<span class="text-nowrap">' +
+                '<i class="fas fa-exchange-alt text-info me-1" onclick="event.stopPropagation(); promptMoveSubUnit(' + s.row + ', \'' + String(s.name).replace(/'/g, "\\'") + '\', \'' + currentUser.role + '\', \'' + currentUser.donVi + '\')" title="Chuyển xã"></i>' +
+                '<i class="fas fa-edit text-primary me-1" onclick="event.stopPropagation(); promptEditSubUnit(' + s.row + ', \'' + String(s.name).replace(/'/g, "\\'") + '\', \'' + currentUser.role + '\', \'' + currentUser.donVi + '\')" title="Sửa"></i>' +
+                '<i class="fas fa-trash text-danger" onclick="event.stopPropagation(); promptDeleteSubUnit(' + s.row + ', \'' + currentUser.role + '\', \'' + currentUser.donVi + '\')" title="Xóa"></i>' +
+              '</span>';
+            }
+            subHtml += '<li class="tree-child-item" onclick="selectTreeSubUnit(\'' + String(parentName).replace(/'/g, "\\'") + '\', \'' + String(s.name).replace(/'/g, "\\'") + '\')">' +
+              '<span><i class="fas fa-map-marker-alt text-primary small"></i> ' + s.name + '</span>' +
+              adminSubBtns +
+            '</li>';
+          });
+        }
+        document.getElementById('sub-list-' + indexKey).innerHTML = subHtml;
+      }).getSubUnits(parentName);
+    }
+
+    function promptEditAllLabel(unitName, indexKey) {
+      let currentText = document.getElementById('label-all-' + indexKey).innerText;
+      let newText = prompt('Nhập tên hiển thị mới:', currentText);
+      if(newText !== null && newText.trim() !== '') {
+        customLabels[unitName] = newText.trim();
+        document.getElementById('label-all-' + indexKey).innerText = newText.trim();
+        showSystemAlert('Đổi tên hiển thị thành công!', 'success');
+      }
+    }
+
+    function promptClearAllLabel(unitName, indexKey) {
+      delete customLabels[unitName];
+      document.getElementById('label-all-' + indexKey).innerText = "[Xem toàn bộ]";
+      showSystemAlert('Đã đặt lại về mặc định!', 'success');
+    }
+
+    function promptAddSubUnit() {
+      if(!currentSelectedParent) return showSystemAlert('Vui lòng chọn một đơn vị trước!', 'warning');
+      let subName = prompt('Nhập tên Thôn / Ấp / Khu phố thuộc "' + currentSelectedParent + '":');
+      if(subName && subName.trim() !== '') {
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) {
+            showSystemAlert('Thêm thôn/ấp thành công!', 'success');
+            fetchUnitTreeData();
+          } else {
+            showSystemAlert(res.msg, 'error');
+          }
+        }).addSubUnit(currentSelectedParent, subName.trim(), currentUser.role, currentUser.donVi);
+      }
+    }
+
+    function promptEditSubUnit(rowNum, oldName, userRole, userDonVi) {
+      let newName = prompt('Sửa tên:', oldName);
+      if(newName && newName.trim() !== '' && newName !== oldName) {
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) {
+            showSystemAlert('Đổi tên thành công!', 'success');
+            fetchUnitTreeData();
+          } else {
+            showSystemAlert(res.msg, 'error');
+          }
+        }).editSubUnit(rowNum, newName.trim(), userRole, userDonVi);
+      }
+    }
+
+    function promptMoveSubUnit(rowNum, subName, userRole, userDonVi) {
+      let targetParent = prompt('Nhập tên đơn vị cha mới muốn chuyển "' + subName + '" đến:');
+      if(targetParent && targetParent.trim() !== '') {
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) {
+            showSystemAlert('Đã di chuyển thành công!', 'success');
+            fetchUnitTreeData();
+          } else {
+            showSystemAlert(res.msg, 'error');
+          }
+        }).moveSubUnitToParent(rowNum, targetParent.trim(), userRole, userDonVi);
+      }
+    }
+
+    function promptDeleteSubUnit(rowNum, userRole, userDonVi) {
+      if(confirm('Chắc chắn xóa đơn vị con này?')) {
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) {
+            showSystemAlert('Đã xóa thành công!', 'success');
+            fetchUnitTreeData();
+          } else {
+            showSystemAlert(res.msg, 'error');
+          }
+        }).deleteSubUnit(rowNum, userRole, userDonVi);
+      }
+    }
+
+    function filterTreeUnits() {
+      let q = document.getElementById('treeSearchInput').value.toLowerCase();
+      let allParents = document.querySelectorAll('#treeUnitList > div[data-parent-unit]');
+      allParents.forEach(div => {
+        let text = div.innerText.toLowerCase();
+        if(text.includes(q)) { div.style.display = 'block'; } 
+        else { div.style.display = 'none'; }
+      });
+    }
+
+    function selectTreeUnit(unitName) {
+      document.getElementById('filterDonVi').value = unitName;
+      document.getElementById('searchInput').value = '';
+      filterContacts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectTreeSubUnit(unitName, subName) {
+      let fullUnitName = unitName + " - " + subName;
+      document.getElementById('filterDonVi').value = unitName;
+      document.getElementById('searchInput').value = subName; 
+      filterContacts();
+      
+      updateFormDropdownUnits(fullUnitName);
+      document.getElementById('c-donvi').value = fullUnitName;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function loadContacts() {
+      document.getElementById('contact-list').innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-danger" role="status"></div><p id="loading-text">Đang tải danh bạ...</p></div>';
+      google.script.run.withFailureHandler(err => { 
+        document.getElementById('contact-list').innerHTML = '<div class="alert alert-danger mt-4 text-center"><b>Lỗi Danh bạ:</b> ' + err.message + '</div>'; 
+      }).withSuccessHandler(data => { 
+        allContacts = data; 
+        
+        if (currentUser.role === 'admin') {
+          document.getElementById('total-contacts-count').innerText = data.length;
+          document.getElementById('admin-stats-badge').classList.remove('hidden');
+        }
+        
+        if (currentUser.role === 'admin' || currentUser.role === 'user') {
+          document.getElementById('btn-batch-move').classList.remove('hidden');
+          document.getElementById('btn-batch-delete').classList.remove('hidden');
+        }
+
+        renderContacts(data); 
+      }).getDanhBa(currentUser.role, currentUser.donVi);
+    }
+
+    // HÀM GỌI ĐIỆN THÔNG MINH (HỖ TRỢ CẢ ĐIỆN THOẠI VÀ MÁY TÍNH)
+    function handleCall(phoneNumber) {
+      if (!phoneNumber) {
+        showSystemAlert('Chưa có số điện thoại!', 'warning');
+        return;
+      }
+      
+      // Kiểm tra xem thiết bị có hỗ trợ gọi trực tiếp không (Mobile)
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = 'tel:' + phoneNumber;
+      } else {
+        // Nếu dùng máy tính, tiến hành copy số vào clipboard và thông báo cho người dùng
+        navigator.clipboard.writeText(phoneNumber).then(() => {
+          showSystemAlert('Đã sao chép số điện thoại <b>' + phoneNumber + '</b> vào bộ nhớ tạm!<br><small class="text-muted">Bạn có thể dán (Ctrl + V) vào ứng dụng gọi điện trên máy tính.</small>', 'success');
+        }).catch(() => {
+          // Fallback nếu trình duyệt chặn clipboard
+          prompt("Số điện thoại của liên hệ (Bạn có thể copy thủ công):", phoneNumber);
+        });
+      }
+    }
+
+    function renderContacts(data) {
+      if(!data || data.length === 0) { 
+        document.getElementById('contact-list').innerHTML = '<p class="text-center mt-5 text-muted">Không tìm thấy liên hệ nào.</p>'; 
+        return; 
+      }
+      if(data.length === 1 && data[0].id === 'error') { 
+        document.getElementById('contact-list').innerHTML = '<div class="alert alert-danger mt-4 text-center">' + data[0].hoten + '</div>'; 
+        return; 
+      }
+
+      let groupedData = {};
+      data.forEach(c => { 
+        let dv = c.donvi ? c.donvi : "Đơn vị Khác"; 
+        if(!groupedData[dv]) groupedData[dv] = []; 
+        groupedData[dv].push(c); 
+      });
+      
+      let { cityList } = getCityAndCommuneUnits(allUnitsOrder);
+
+      let sortedKeys = Object.keys(groupedData).sort((a, b) => {
+        let isCityA = cityList.includes(a) || explicitCityBlocks.includes(a);
+        let isCityB = cityList.includes(b) || explicitCityBlocks.includes(b);
+        if (isCityA && !isCityB) return -1;
+        if (!isCityA && isCityB) return 1;
+
+        let isHamletA = a.includes(" - ");
+        let isHamletB = b.includes(" - ");
+        if (!isHamletA && isHamletB) return -1;
+        if (isHamletA && !isHamletB) return 1;
+
+        let baseA = isHamletA ? a.split(" - ")[0] : a;
+        let baseB = isHamletB ? b.split(" - ")[0] : b;
+        let idxA = allUnitsOrder.indexOf(baseA);
+        let idxB = allUnitsOrder.indexOf(baseB);
+        if(idxA === -1) idxA = 9999;
+        if(idxB === -1) idxB = 9999;
+        if(idxA !== idxB) return idxA - idxB;
+
+        return a.localeCompare(b);
+      });
+
+      let html = '';
+      let hasRenderedCity = false;
+      let hasRenderedCommune = false;
+      let hasRenderedHamlet = false;
+
+      for (let donvi of sortedKeys) {
+        let displayGroupHeader = donvi;
+        let headerIcon = '';
+        let isCity = cityList.includes(donvi) || explicitCityBlocks.includes(donvi);
+        let isHamlet = donvi.includes(" - ");
+
+        if (isCity) {
+          if (!hasRenderedCity) {
+            html += '<div class="tier-main-header tier-city-bg"><i class="fas fa-city"></i> Cấp Thành Phố</div>';
+            hasRenderedCity = true;
+          }
+          headerIcon = '<i class="fas fa-building text-primary"></i>';
+        } else if (isHamlet) {
+          if (!hasRenderedHamlet) {
+            html += '<div class="tier-main-header tier-hamlet-bg"><i class="fas fa-map-marker-alt"></i> Cấp Thôn / Ấp / Khu Phố</div>';
+            hasRenderedHamlet = true;
+          }
+          let parts = donvi.split(" - ");
+          displayGroupHeader = parts[1] + " - " + parts[0];
+          headerIcon = '<i class="fas fa-map-marker-alt text-success"></i>';
+        } else {
+          if (!hasRenderedCommune) {
+            html += '<div class="tier-main-header tier-commune-bg"><i class="fas fa-landmark"></i> Cấp Xã / Phường</div>';
+            hasRenderedCommune = true;
+          }
+          headerIcon = '<i class="fas fa-landmark text-danger"></i>';
+        }
+
+        html += '<div class="group-header">' + headerIcon + ' ' + displayGroupHeader + '</div>';
+        html += '<div class="row g-4 mb-4">';
+        
+        groupedData[donvi].forEach(c => {
+          let adminBtns = '';
+          let canManageContact = (currentUser.role === 'admin' || currentUser.donVi === c.donvi || c.donvi.startsWith(currentUser.donVi + " -"));
+          let checkboxHtml = '';
+
+          if (canManageContact) {
+            checkboxHtml = '<input type="checkbox" class="form-check-input contact-checkbox me-2" value="' + c.id + '" style="cursor: pointer; transform: scale(1.2);">';
+          }
+
+          if (canManageContact) {
+            adminBtns = '<div class="border-start ps-2 ms-1 d-flex gap-1">' +
+              '<button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="moveContact(\'' + c.id + '\', \'up\')" title="Lên"><i class="fas fa-arrow-up"></i></button>' +
+              '<button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="moveContact(\'' + c.id + '\', \'down\')" title="Xuống"><i class="fas fa-arrow-down"></i></button>' +
+              '<button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="editForm(\'' + c.id + '\')" title="Sửa"><i class="fas fa-edit"></i></button>' +
+              '<button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="delContact(\'' + c.id + '\')" title="Xóa"><i class="fas fa-trash"></i></button>' +
+            '</div>';
+          }
+          
+          let safePhone = c.sdt ? String(c.sdt).replace(/'/g, "\\'") : '';
+          let callAction = safePhone ? `href="javascript:void(0)" onclick="handleCall('${safePhone}')"` : 'href="javascript:void(0)" onclick="showSystemAlert(\'Chưa có số điện thoại!\', \'warning\')"';
+          let zaloLink = c.sdt ? 'href="https://zalo.me/' + c.sdt.replace(/^0/, '84') + '" target="_blank"' : 'href="javascript:void(0)" onclick="showSystemAlert(\'Chưa có số Zalo!\', \'warning\')"';
+          let emailLink = c.email ? 'href="https://mail.google.com/mail/?view=cm&fs=1&to=' + c.email + '" target="_blank"' : 'href="javascript:void(0)" onclick="showSystemAlert(\'Liên hệ này chưa có Email!\', \'warning\')"';
+
+          let displayUnitLabel = c.donvi;
+          if(c.donvi.includes(" - ")) {
+            let parts = c.donvi.split(" - ");
+            displayUnitLabel = '<span class="text-success fw-semibold"><i class="fas fa-map-marker-alt"></i> ' + parts[1] + '</span> <span class="text-muted">(' + parts[0] + ')</span>';
+          } else if (isCity) {
+            displayUnitLabel = '<span class="text-primary fw-semibold"><i class="fas fa-building"></i> ' + c.donvi + '</span>';
+          } else {
+            displayUnitLabel = '<span class="text-danger fw-semibold"><i class="fas fa-landmark"></i> ' + c.donvi + '</span>';
+          }
+
+          let phoneDisplayHtml = c.sdt ? '<div class="text-success fw-bold" style="font-size: 13.5px; margin-top: 2px;"><i class="fas fa-phone-alt fa-xs" style="transform: scaleX(-1);"></i> ĐT: ' + c.sdt + '</div>' : '';
+
+          html += '<div class="col-12 col-md-6 col-lg-6">' +
+            '<div class="bg-white rounded p-3 shadow-sm d-flex flex-column h-100" style="border-left: 4px solid #cc0000;">' +
+              '<div class="d-flex align-items-center gap-3 mb-3">' +
+                checkboxHtml +
+                '<img src="' + c.hinhanh + '" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/149/149071.png\'" class="rounded-circle shadow-sm" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ffcc00; flex-shrink: 0;">' +
+                '<div>' +
+                  '<div class="fw-bold" style="color: #cc0000; font-size: 16px;">' + c.hoten + '</div>' +
+                  '<div class="fw-medium text-dark" style="font-size: 14px; margin-top: 2px;">' + c.chucvu + '</div>' +
+                  phoneDisplayHtml +
+                  '<div class="text-muted" style="font-size: 13px; margin-top: 2px;">' + displayUnitLabel + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="border-top pt-3 mt-auto d-flex justify-content-around align-items-center">' +
+                '<a ' + callAction + ' class="text-decoration-none fw-medium" style="color: #28a745; font-size: 14px; cursor: pointer;"><i class="fas fa-phone" style="transform: scaleX(-1);"></i> Gọi</a>' +
+                '<a ' + zaloLink + ' class="text-decoration-none fw-medium" style="color: #0068ff; font-size: 14px;"><i class="fas fa-comment-dots"></i> Zalo</a>' +
+                '<a ' + emailLink + ' class="text-decoration-none fw-medium" style="color: #dc3545; font-size: 14px;"><i class="fas fa-envelope"></i> Mail</a>' +
+                adminBtns +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }); 
+        html += '</div>'; 
+      } 
+      document.getElementById('contact-list').innerHTML = html;
+    }
+
+    function openBatchMoveModal() {
+      let selectedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+      if (selectedCheckboxes.length === 0) {
+        return showSystemAlert('Vui lòng tích chọn ít nhất một nhân sự cần di chuyển!', 'warning');
+      }
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('batchMoveModal')).show();
+    }
+
+    function executeBatchMove() {
+      let selectedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+      let targetUnit = document.getElementById('batch-target-unit').value;
+      if (!targetUnit) return showSystemAlert('Vui lòng chọn đơn vị đích!', 'warning');
+
+      let ids = Array.from(selectedCheckboxes).map(cb => cb.value);
+      bootstrap.Modal.getInstance(document.getElementById('batchMoveModal')).hide();
+
+      let successCount = 0;
+      let total = ids.length;
+
+      ids.forEach(id => {
+        let contact = allContacts.find(x => x.id == id);
+        if (contact) {
+          google.script.run.withSuccessHandler(() => {
+            successCount++;
+            if (successCount === total) {
+              showSystemAlert('Đã di chuyển thành công ' + total + ' nhân sự sang đơn vị: ' + targetUnit, 'success');
+              loadContacts();
+            }
+          }).saveContact(contact.id, contact.hoten, contact.chucvu, targetUnit, contact.sdt, contact.email, contact.hinhanh);
+        }
+      });
+    }
+
+    function executeBatchDelete() {
+      let selectedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+      if (selectedCheckboxes.length === 0) {
+        return showSystemAlert('Vui lòng tích chọn ít nhất một danh bạ cần xóa!', 'warning');
+      }
+
+      if(confirm('Chắc chắn xóa vĩnh viễn ' + selectedCheckboxes.length + ' danh bạ đã chọn? Hành động này không thể hoàn tác!')) {
+        let ids = Array.from(selectedCheckboxes).map(cb => cb.value);
+        
+        let btn = document.getElementById('btn-batch-delete');
+        let oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xóa...';
+        btn.disabled = true;
+
+        google.script.run.withSuccessHandler(res => {
+          btn.innerHTML = oldText;
+          btn.disabled = false;
+          if (res.success) {
+            showSystemAlert('Đã xóa thành công ' + res.count + ' danh bạ!', 'success');
+            loadContacts();
+          } else {
+            showSystemAlert('Lỗi: ' + res.msg, 'error');
+          }
+        }).withFailureHandler(err => {
+          btn.innerHTML = oldText;
+          btn.disabled = false;
+          showSystemAlert('Lỗi kết nối: ' + err.message, 'error');
+        }).deleteMultipleContacts(ids);
+      }
+    }
+
+    function moveContact(id, dir) { 
+      google.script.run.withSuccessHandler(res => { 
+        if(res.success) { loadContacts(); } else { showSystemAlert(res.msg, 'warning'); } 
+      }).moveContact(id, dir); 
+    }
+
+    function filterContacts() { 
+      let q = document.getElementById('searchInput').value.toLowerCase(); 
+      let fUnit = document.getElementById('filterDonVi').value;
+      let filtered = allContacts.filter(c => { 
+        let matchText = c.hoten.toLowerCase().includes(q) || c.chucvu.toLowerCase().includes(q) || c.donvi.toLowerCase().includes(q);
+        let matchUnit = (fUnit === "") || (c.donvi === fUnit || c.donvi.startsWith(fUnit + " -"));
+        return matchText && matchUnit; 
+      });
+      renderContacts(filtered); 
+    }
+
+    function loadAccountManager() { 
+      switchView('admin-container');
+      document.getElementById('pending-list').innerHTML = '<div class="text-center mt-3"><div class="spinner-border text-danger" role="status"></div><p>Đang tải danh sách tài khoản...</p></div>'; 
+      
+      google.script.run.withFailureHandler(err => {
+        document.getElementById('pending-list').innerHTML = '<div class="alert alert-danger text-center">Lỗi tải dữ liệu: ' + err.message + '</div>';
+      }).withSuccessHandler(data => { 
+        allAccountsData = data; 
+        renderAccountList(data);
+      }).getAccountList(); 
+    }
+
+    function renderAccountList(data) {
+      if(!data || data.length === 0) { 
+        document.getElementById('pending-list').innerHTML = '<p class="text-success text-center">Không tìm thấy tài khoản nào.</p>'; 
+        return; 
+      } 
+      
+      let html = '';
+      data.forEach(tk => {
+        let badgeStatus = tk.status === 'Đã duyệt' ? 'bg-success' : 'bg-warning';
+        let btnDuyet = '<button class="btn btn-sm btn-success me-1" onclick="approveTK(' + tk.row + ')" title="Duyệt / Chuyển đổi trạng thái"><i class="fas fa-check"></i></button>';
+        
+        let safeUsername = tk.username ? String(tk.username).replace(/'/g, "\\'") : '';
+        let safeDonVi = tk.donVi ? String(tk.donVi).replace(/'/g, "\\'") : '';
+
+        html += '<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center shadow-sm">' +
+          '<div>' +
+            '<strong>' + tk.fullname + '</strong> <span class="text-muted">(' + tk.username + ')</span><br>' +
+            '<small class="text-muted">' + tk.donVi + '</small><br>' +
+            '<span class="badge ' + badgeStatus + '">' + tk.status + '</span>' +
+          '</div>' +
+          '<div class="text-nowrap d-flex gap-1">' +
+            btnDuyet +
+            '<button class="btn btn-sm btn-info text-white" onclick="changeUserUnitPrompt(' + tk.row + ', \'' + safeUsername + '\', \'' + safeDonVi + '\')" title="Chuyển đơn vị"><i class="fas fa-exchange-alt"></i></button>' +
+            '<button class="btn btn-sm btn-warning text-white" onclick="resetPW(' + tk.row + ')" title="Reset mật khẩu"><i class="fas fa-key"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteTK(' + tk.row + ')" title="Xóa tài khoản"><i class="fas fa-trash"></i></button>' +
+          '</div>' +
+        '</div>';
+      });
+      document.getElementById('pending-list').innerHTML = html;
+    }
+
+    function filterAccountList() {
+      let q = document.getElementById('accountSearchInput').value.toLowerCase();
+      let filtered = allAccountsData.filter(tk => 
+        (tk.username && String(tk.username).toLowerCase().includes(q)) || 
+        (tk.fullname && String(tk.fullname).toLowerCase().includes(q)) || 
+        (tk.donVi && String(tk.donVi).toLowerCase().includes(q))
+      );
+      renderAccountList(filtered);
+    }
+
+    function approveTK(rowNum) { 
+      let targetAcc = allAccountsData.find(x => x.row == rowNum);
+      let newStatus = (targetAcc && targetAcc.status === 'Đã duyệt') ? 'Chờ duyệt' : 'Đã duyệt';
+
+      google.script.run.withSuccessHandler(() => {
+        showSystemAlert('Đã cập nhật trạng thái tài khoản thành: ' + newStatus, 'success');
+        loadAccountManager();
+      }).withFailureHandler(err => {
+        showSystemAlert('Lỗi: ' + err.message, 'error');
+      }).approveAccount(rowNum, newStatus); 
+    }
+
+    function resetPW(rowNum) { 
+      if(confirm('Reset mật khẩu của tài khoản này về mặc định: Mttq@123456 ?')) { 
+        google.script.run.withSuccessHandler(res => { 
+          showSystemAlert('Đã reset mật khẩu thành: Mttq@123456', 'success'); 
+          loadAccountManager(); 
+        }).resetAccountPassword(rowNum); 
+      } 
+    }
+
+    function deleteTK(rowNum) { 
+      if(confirm('Chắc chắn xóa vĩnh viễn tài khoản này?')) { 
+        google.script.run.withSuccessHandler(() => {
+          showSystemAlert('Xóa tài khoản thành công!', 'success');
+          loadAccountManager();
+        }).deleteAccount(rowNum); 
+      } 
+    }
+    
+    function changeUserUnitPrompt(rowNum, username, currentUnit) {
+      document.getElementById('change-unit-row').value = rowNum; 
+      document.getElementById('change-unit-username').innerText = username;
+      
+      let options = '';
+      let combined = [...explicitCityBlocks, ...allUnitsOrder];
+      let uniqueFormSet = new Set(combined);
+      uniqueFormSet.forEach(u => {
+        let isSelected = (u === currentUnit) ? 'selected' : '';
+        options += '<option value="' + u + '" ' + isSelected + '>' + u + '</option>';
+      });
+      
+      document.getElementById('change-unit-select').innerHTML = options; 
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('changeUnitModal')).show();
+    }
+    
+    function submitChangeUnit() {
+      let rowNum = document.getElementById('change-unit-row').value; 
+      let newUnit = document.getElementById('change-unit-select').value;
+      bootstrap.Modal.getInstance(document.getElementById('changeUnitModal')).hide();
+      google.script.run.withSuccessHandler(() => { 
+        showSystemAlert('Đã chuyển đơn vị thành công!', 'success'); 
+        loadAccountManager(); 
+      }).changeUserUnit(rowNum, newUnit);
+    }
+
+    function goHome() {
+      switchView('main-container');
+      document.getElementById('searchInput').value = ''; 
+      document.getElementById('filterDonVi').value = currentUser.role === 'user' ? currentUser.donVi : ''; 
+      renderContacts(allContacts);
+    }
+
+    function promptRenameMyUnit() {
+      let newName = prompt('Đổi tên đơn vị quản trị của bạn:', currentUser.donVi);
+      if(newName && newName.trim() !== '' && newName !== currentUser.donVi) {
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) { 
+            showSystemAlert('Đổi tên đơn vị thành công!', 'success'); 
+            currentUser.donVi = newName.trim(); 
+            document.getElementById('header-user-info').innerText = `${currentUser.role.toUpperCase()} - ${currentUser.donVi}`; 
+            document.getElementById('c-donvi').value = currentUser.donVi; 
+            goHome(); 
+            fetchUnitTreeData(); 
+          } else { 
+            showSystemAlert(res.msg, 'error'); 
+          }
+        }).editDonVi(currentUser.donVi, newName.trim());
+      }
+    }
+
+    function downloadTemplate() {
+      const headers = "ID (De trong),Ho ten,Chuc vu,Don vi,Hinh anh (Link URL neu co),So dien thoai,Email\n";
+      const sample = ",Nguyễn Văn A,Chuyên viên,Văn phòng,,0901234567,nva@example.com\n";
+      const blob = new Blob(["\uFEFF" + headers + sample], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      if (link.download !== undefined) { 
+        const url = URL.createObjectURL(blob); 
+        link.setAttribute("href", url); 
+        link.setAttribute("download", "Mau_Nhap_Danh_Ba.csv"); 
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link); 
+      }
+    }
+
+    function showImportGuide() { switchView('import-container'); }
+
+    function showChangePwBox() { 
+      switchView('password-container');
+      document.getElementById('pw-old').value = ''; 
+      document.getElementById('pw-new').value = ''; 
+      document.getElementById('pw-confirm').value = ''; 
+    }
+
+    function showProfileBox() {
+      switchView('profile-container');
+      document.getElementById('profile-fullname').value = currentUser.fullname || '';
+    }
+
+    function doUpdateProfile() {
+      let newName = document.getElementById('profile-fullname').value.trim();
+      if(!newName) return showSystemAlert('Vui lòng nhập họ và tên!', 'warning');
+      google.script.run.withSuccessHandler(res => {
+        if(res.success) {
+          showSystemAlert(res.msg, 'success');
+          currentUser.fullname = newName;
+          goHome();
+        } else {
+          showSystemAlert(res.msg, 'error');
+        }
+      }).updateUserInfo(currentUser.username, newName);
+    }
+
+    function processImport() {
+      let fileInput = document.getElementById('csv-upload');
+      if(fileInput.files.length === 0) return showSystemAlert("Vui lòng chọn File CSV!", 'warning');
+      let file = fileInput.files[0]; 
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        let text = e.target.result; 
+        event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+        google.script.run.withFailureHandler(err => { 
+          showSystemAlert("Lỗi máy chủ: " + err.message, 'error'); 
+          goHome(); 
+        }).withSuccessHandler(res => { 
+          if(res.success) { showSystemAlert(res.msg, 'success'); } 
+          else { showSystemAlert(res.msg, 'error'); } 
+          goHome(); 
+          loadContacts(); 
+        }).importCSVData(text, currentUser.role, currentUser.donVi);
+      }; 
+      reader.readAsText(file, "UTF-8");
+    }
+
+    document.getElementById('c-hinhanh-upload').addEventListener('change', function(e) {
+      let files = e.target.files;
+      if (files && files.length > 0) {
+        let file = files[0];
+        let reader = new FileReader();
+        reader.onload = function(event) {
+          let imageEl = document.getElementById('image-to-crop');
+          imageEl.src = event.target.result;
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('cropModal')).show();
+          if (cropper) { cropper.destroy(); }
+          setTimeout(() => {
+            cropper = new Cropper(imageEl, {
+              aspectRatio: 1,
+              viewMode: 1,
+              dragMode: 'move',
+              autoCropArea: 0.8,
+              responsive: true,
+            });
+          }, 200);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function confirmCropImage() {
+      if (!cropper) return;
+      let canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
+      compressedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('preview-img').src = compressedImageBase64;
+      bootstrap.Modal.getInstance(document.getElementById('cropModal')).hide();
+    }
+
+    function showLoginBox() { 
+      switchView('auth-container');
+      setTimeout(() => {
+        let u = document.getElementById('username');
+        if(u) u.focus();
+      }, 100);
+    }
+    
+    function toggleAuthBox() { 
+      document.getElementById('login-box').classList.toggle('hidden'); 
+      document.getElementById('register-box').classList.toggle('hidden'); 
+    }
+
+    function doLogin() {
+      let uInp = document.getElementById('username');
+      let pInp = document.getElementById('password');
+      if(!uInp || !pInp || !uInp.value || !pInp.value) return;
+      
+      let u = uInp.value.toLowerCase().trim(); 
+      let p = pInp.value; 
+      
+      let btn = document.getElementById('btn-login');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+      btn.disabled = true;
+      
+      google.script.run.withFailureHandler(err => { 
+        btn.innerHTML = 'Đăng Nhập'; 
+        btn.disabled = false;
+        showSystemAlert("LỖI: " + err.message, 'error'); 
+      }).withSuccessHandler(res => {
+        btn.innerHTML = 'Đăng Nhập';
+        btn.disabled = false;
+        if(res.success) {
+          currentUser = res;
+          document.getElementById('btn-show-login').classList.add('hidden'); 
+          document.getElementById('user-info-area').classList.remove('hidden');
+          document.getElementById('header-user-info').innerText = `${String(currentUser.role).toUpperCase()} - ${currentUser.donVi}`;
+          if(currentUser.role === 'admin' || currentUser.role === 'user') { 
+            document.getElementById('btn-add').classList.remove('hidden'); 
+            document.getElementById('btn-import').classList.remove('hidden'); 
+          }
+          if(currentUser.role === 'user') { document.getElementById('btn-rename-unit').classList.remove('hidden'); }
+          if(currentUser.role === 'admin') { 
+            document.getElementById('admin-actions').classList.remove('hidden'); 
+          }
+          goHome(); 
+          fetchUnitTreeData();
+        } else {
+          showSystemAlert(res.msg, 'error');
+        }
+      }).loginUser(u, p);
+    }
+
+    function doLogout() { 
+      currentUser = { role: 'guest', donVi: '', username: '', fullname: '' }; 
+      document.getElementById('user-info-area').classList.add('hidden'); 
+      document.getElementById('btn-show-login').classList.remove('hidden'); 
+      document.getElementById('btn-add').classList.add('hidden'); 
+      document.getElementById('btn-import').classList.add('hidden'); 
+      document.getElementById('btn-rename-unit').classList.add('hidden'); 
+      document.getElementById('admin-actions').classList.add('hidden'); 
+      document.getElementById('btnAddSubUnitMain').classList.add('hidden');
+      document.getElementById('admin-stats-badge').classList.add('hidden');
+      document.getElementById('btn-batch-move').classList.add('hidden');
+      document.getElementById('btn-batch-delete').classList.add('hidden');
+      document.getElementById('username').value = ''; 
+      document.getElementById('password').value = ''; 
+      goHome(); 
+      fetchUnitTreeData(); 
+    }
+
+    function doRegister() { 
+      let fn = document.getElementById('reg-fullname').value.trim();
+      let u = document.getElementById('reg-username').value.toLowerCase().trim(); 
+      let p = document.getElementById('reg-password').value; 
+      let d = document.getElementById('reg-donvi').value; 
+      if(!fn) return showSystemAlert("Vui lòng nhập Họ và tên!", 'warning');
+      if (!/^[a-z0-9_.]+$/.test(u)) return showSystemAlert("Tên đăng nhập không hợp lệ!", 'warning');
+      google.script.run.withFailureHandler(err => showSystemAlert("Lỗi: " + err.message, 'error')).withSuccessHandler(res => { 
+        if(res.success) { showSystemAlert(res.msg, 'success'); toggleAuthBox(); } 
+        else { showSystemAlert(res.msg, 'error'); } 
+      }).registerAccount(u, p, d, fn); 
+    }
+
+    function doChangePassword() {
+      let oldPw = document.getElementById('pw-old').value; 
+      let newPw = document.getElementById('pw-new').value; 
+      let confirmPw = document.getElementById('pw-confirm').value;
+      if(!oldPw || !newPw || !confirmPw) return showSystemAlert('Vui lòng điền đầy đủ thông tin!', 'warning');
+      if(newPw !== confirmPw) return showSystemAlert('Mật khẩu xác nhận không khớp!', 'warning');
+      if(newPw.length < 6) return showSystemAlert('Mật khẩu mới phải từ 6 ký tự trở lên!', 'warning');
+
+      google.script.run.withSuccessHandler(res => { 
+        if(res.success) { showSystemAlert(res.msg, 'success'); doLogout(); } 
+        else { showSystemAlert(res.msg, 'error'); } 
+      }).changePassword(currentUser.username, oldPw, newPw);
+    }
+
+    function showForm() { 
+      switchView('form-container');
+      document.getElementById('c-id').value = ''; 
+      document.getElementById('c-hoten').value = ''; 
+      document.getElementById('c-chucvu').value = ''; 
+      document.getElementById('c-donvi').value = currentUser.donVi || allUnitsOrder[0];
+      document.getElementById('c-sdt').value = ''; 
+      document.getElementById('c-email').value = ''; 
+      document.getElementById('preview-img').src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'; 
+      document.getElementById('c-hinhanh-upload').value = ""; 
+      compressedImageBase64 = ''; 
+      document.getElementById('form-title').innerText = "Thêm liên hệ mới"; 
+    }
+
+    function editForm(id) { 
+      let c = allContacts.find(x => x.id == id); 
+      switchView('form-container');
+      document.getElementById('form-title').innerText = "Sửa liên hệ"; 
+      document.getElementById('c-id').value = c.id; 
+      document.getElementById('c-hoten').value = c.hoten; 
+      document.getElementById('c-chucvu').value = c.chucvu; 
+      document.getElementById('c-donvi').value = c.donvi; 
+      document.getElementById('c-sdt').value = c.sdt; 
+      document.getElementById('c-email').value = c.email; 
+      document.getElementById('preview-img').src = c.hinhanh; 
+      compressedImageBase64 = ''; 
+    }
+    
+    function saveContact() { 
+      let id = document.getElementById('c-id').value; 
+      let hoten = document.getElementById('c-hoten').value; 
+      let chucvu = document.getElementById('c-chucvu').value; 
+      let donvi = document.getElementById('c-donvi').value; 
+      
+      let rawSdt = document.getElementById('c-sdt').value || '';
+      let sdt = String(rawSdt).replace(/[\s\.]/g, ''); 
+      if(sdt !== '' && !sdt.startsWith('0')) {
+        sdt = '0' + sdt; 
+      }
+      
+      let email = document.getElementById('c-email').value; 
+      
+      if(!hoten || !sdt) return showSystemAlert("Vui lòng nhập họ tên và số điện thoại!", 'warning'); 
+      event.target.innerHTML = 'Đang lưu...'; 
+      
+      google.script.run.withFailureHandler(err => { 
+        event.target.innerHTML = 'Lưu thông tin'; 
+        showSystemAlert("Lỗi: " + err.message, 'error'); 
+      }).withSuccessHandler(() => { 
+        document.querySelector('#form-container .btn-gradient').innerHTML = 'Lưu thông tin'; 
+        showSystemAlert('Lưu dữ liệu thành công!', 'success'); 
+        goHome(); 
+        loadContacts(); 
+      }).saveContact(id, hoten, chucvu, donvi, sdt, email, compressedImageBase64); 
+    }
+    
+    function delContact(id) { 
+      if(confirm('Chắc chắn xóa liên hệ này?')) { 
+        google.script.run.withSuccessHandler(loadContacts).deleteContact(id); 
+      } 
+    }
+
+    function loadUnitManager() { 
+      try {
+        switchView('unit-container');
+        fetchUnits(); 
+      } catch(e) {
+        showSystemAlert("Lỗi tải trang: " + e.message, "error");
+      }
+    }
+    
+    function fetchUnits() { 
+      let unitListEl = document.getElementById('unit-list');
+      if(unitListEl) unitListEl.innerHTML = '<div class="text-center mt-3"><div class="spinner-border text-info" role="status"></div><p>Đang tải danh sách đơn vị...</p></div>'; 
+      
+      google.script.run.withFailureHandler(err => {
+        showSystemAlert("Lỗi tải danh mục đơn vị: " + err.message, "error");
+      }).withSuccessHandler(data => { 
+        if(!data || data.length === 0) { 
+          document.getElementById('unit-list').innerHTML = '<p class="text-center">Chưa có đơn vị nào.</p>'; 
+          return; 
+        } 
+        
+        let html = '';
+        data.forEach(u => {
+          let safeU = String(u).replace(/'/g, "\\'");
+          html += '<div class="card p-2 mb-2 d-flex flex-row justify-content-between align-items-center shadow-sm">' +
+            '<span class="fw-bold text-dark">' + u + '</span>' +
+            '<div class="text-nowrap">' +
+              '<button class="btn btn-sm btn-outline-secondary me-1" onclick="moveUnit(\'' + safeU + '\', \'top\')" title="Lên đầu"><i class="fas fa-angle-double-up"></i></button>' +
+              '<button class="btn btn-sm btn-outline-secondary me-1" onclick="moveUnit(\'' + safeU + '\', \'up\')" title="Lên 1 bậc"><i class="fas fa-arrow-up"></i></button>' +
+              '<button class="btn btn-sm btn-outline-secondary me-1" onclick="moveUnit(\'' + safeU + '\', \'down\')" title="Xuống 1 bậc"><i class="fas fa-arrow-down"></i></button>' +
+              '<button class="btn btn-sm btn-outline-secondary me-3" onclick="moveUnit(\'' + safeU + '\', \'bottom\')" title="Xuống cuối"><i class="fas fa-angle-double-down"></i></button>' +
+              '<button class="btn btn-sm btn-outline-primary me-1" onclick="editUnit(\'' + safeU + '\')" title="Đổi tên"><i class="fas fa-edit"></i></button>' +
+              '<button class="btn btn-sm btn-outline-danger" onclick="deleteUnit(\'' + safeU + '\')" title="Xóa"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+          '</div>';
+        });
+        document.getElementById('unit-list').innerHTML = html; 
+      }).getDonViList(); 
+    }
+    
+    function addUnit() { 
+      let name = document.getElementById('new-unit-name').value.trim(); 
+      if(!name) return showSystemAlert('Vui lòng nhập tên đơn vị!', 'warning'); 
+      google.script.run.withSuccessHandler(res => { 
+        if(res.success) { 
+          document.getElementById('new-unit-name').value = ''; 
+          fetchUnits(); 
+          fetchUnitTreeData(); 
+        } else {
+          showSystemAlert(res.msg, 'error'); 
+        }
+      }).addDonVi(name); 
+    }
+    
+    function editUnit(oldName) { 
+      let newName = prompt('Nhập tên mới:', oldName); 
+      if(newName && newName.trim() !== '' && newName !== oldName) { 
+        google.script.run.withSuccessHandler(res => { 
+          if(res.success) { 
+            fetchUnits(); 
+            fetchUnitTreeData(); 
+          } else {
+            showSystemAlert(res.msg, 'error'); 
+          }
+        }).editDonVi(oldName, newName.trim()); 
+      } 
+    }
+    
+    function deleteUnit(name) { 
+      if(confirm('Chắc chắn xóa đơn vị: "' + name + '"?')) { 
+        google.script.run.withSuccessHandler(res => { 
+          if(res.success) { 
+            fetchUnits(); 
+            fetchUnitTreeData(); 
+          } else {
+            showSystemAlert(res.msg, 'error'); 
+          }
+        }).deleteDonVi(name); 
+      } 
+    }
+    
+    function moveUnit(name, dir) { 
+      google.script.run.withSuccessHandler(res => { 
+        if(res.success) { 
+          fetchUnits(); 
+          fetchUnitTreeData(); 
+        } 
+      }).moveDonVi(name, dir); 
+    }
+  </script>
+</body>
+</html>
