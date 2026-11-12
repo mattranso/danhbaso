@@ -1,7 +1,10 @@
 const SHEET_ID = '1vTCBqjZFqxX9LgnGBku0IZTp5VbLaiDh8EAhX5TvmyY'; 
 
 function doGet() {
-  return HtmlService.createTemplateFromFile('Index').evaluate().setTitle('Danh bạ - Ủy ban Mặt trận Tổ quốc Việt Nam thành phố Đồng Nai').addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  return HtmlService.createTemplateFromFile('Index').evaluate()
+    .setTitle('Danh bạ - Ủy ban Mặt trận Tổ quốc Việt Nam thành phố Đồng Nai')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 // HÀM MỚI: TĂNG VÀ LẤY TỔNG SỐ LƯỢT TRUY CẬP
